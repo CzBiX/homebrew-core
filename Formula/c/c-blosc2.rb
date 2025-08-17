@@ -1,8 +1,8 @@
 class CBlosc2 < Formula
   desc "Fast, compressed, persistent binary data store library for C"
   homepage "https://www.blosc.org"
-  url "https://github.com/Blosc/c-blosc2/archive/refs/tags/v2.20.0.tar.gz"
-  sha256 "499e881f9fd868cbbaba69bc6d27d82b2d72ef22c998691d60e8b3c3ef0be459"
+  url "https://github.com/Blosc/c-blosc2/archive/refs/tags/v2.21.0.tar.gz"
+  sha256 "de69eedd87a8301cdb665f3dab61e7c2b7e4b326a496f9ec88213fc8788d54d5"
   license "BSD-3-Clause"
   head "https://github.com/Blosc/c-blosc2.git", branch: "main"
 
@@ -26,10 +26,28 @@ class CBlosc2 < Formula
     depends_on "llvm" => :build if DevelopmentTools.clang_build_version <= 1400
   end
 
+  # Apply open PR to fix lz4 detection: https://github.com/Blosc/c-blosc2/pull/690
+  patch do
+    url "https://github.com/Blosc/c-blosc2/commit/365fc46afd585880d4726cac49cefdfcaa75be3b.patch?full_index=1"
+    sha256 "0473f56cb712479ef9df11d5453e77f2a50c2e17f27fb2f3010f616bc00cdbf7"
+  end
+  patch do
+    url "https://github.com/Blosc/c-blosc2/commit/df525d2fe0a519a4999483e81807621b407c07a7.patch?full_index=1"
+    sha256 "0df6b619f62a9e845fe7fc31c3e12704dcd92c98dcb86bd53026758f67a13f21"
+  end
+
   def install
     ENV.llvm_clang if OS.mac? && DevelopmentTools.clang_build_version <= 1400
 
+    internal_complibs = buildpath.glob("internal-complibs/{lz4,zlib,zstd}-*")
+    odie "Failed to find vendored sources for removal!" if internal_complibs.count != 3
+    rm_r internal_complibs
+
     args = %w[
+      -DBUILD_TESTS=OFF
+      -DBUILD_FUZZERS=OFF
+      -DBUILD_BENCHMARKS=OFF
+      -DBUILD_EXAMPLES=OFF
       -DPREFER_EXTERNAL_LZ4=ON
       -DPREFER_EXTERNAL_ZLIB=ON
       -DPREFER_EXTERNAL_ZSTD=ON
