@@ -6,7 +6,7 @@ class Dnsdist < Formula
   url "https://downloads.powerdns.com/releases/dnsdist-2.0.0.tar.xz"
   sha256 "da30742f51aac8be7e116677cb07bc49fbea979fc5443e7e1fa8fa7bd0a63fe5"
   license "GPL-2.0-only"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://downloads.powerdns.com/releases/"
@@ -27,7 +27,6 @@ class Dnsdist < Formula
   depends_on "libyaml" => :build # for PyYaml
   depends_on "pkgconf" => :build
   depends_on "python@3.13" => :build
-  depends_on "abseil"
   depends_on "fstrm"
   depends_on "libnghttp2"
   depends_on "libsodium"
@@ -47,6 +46,9 @@ class Dnsdist < Formula
     venv = virtualenv_create(buildpath/"bootstrap", "python3")
     venv.pip_install resources
     ENV.prepend_path "PATH", venv.root/"bin"
+
+    # Avoid over-linkage to `abseil`.
+    ENV.append "LDFLAGS", "-Wl,-dead_strip_dylibs" if OS.mac?
 
     system "./configure", "--disable-silent-rules",
                           "--without-net-snmp",
