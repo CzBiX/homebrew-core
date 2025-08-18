@@ -6,7 +6,7 @@ class Openvino < Formula
   url "https://github.com/openvinotoolkit/openvino/archive/refs/tags/2025.2.0.tar.gz"
   sha256 "15cd5c9beb320a8feadd18bcae40970608de154d5057277281dc53dd7023e383"
   license "Apache-2.0"
-  revision 2
+  revision 3
   head "https://github.com/openvinotoolkit/openvino.git", branch: "master"
 
   livecheck do
@@ -65,7 +65,15 @@ class Openvino < Formula
   end
 
   on_intel do
-    depends_on "xbyak" => :build
+    # FIXME: depends_on "xbyak" => :build
+    #
+    # compute_hash.cpp:418:53: error: use of overloaded operator '+' is ambiguous
+    # (with operand types 'RegistersPool::Reg<Xbyak::Reg64>' and 'const uint64_t'
+    # after https://github.com/herumi/xbyak/commit/689767da682edab65b55e9607535c28902370b08
+    resource "xbyak" do
+      url "https://github.com/herumi/xbyak/archive/refs/tags/v7.28.tar.gz"
+      sha256 "c8da3d85fa322303cb312d6315592547952d7bb81f58bf98bc0a26ecd88be495"
+    end
   end
 
   resource "mlas" do
@@ -135,6 +143,9 @@ class Openvino < Formula
     elsif OS.linux?
       resource("onednn_gpu").stage buildpath/"src/plugins/intel_gpu/thirdparty/onednn_gpu"
     end
+
+    # TODO: Remove once able to build with xbyak >= 7.29
+    resource("xbyak").stage buildpath/"thirdparty/xbyak" if Hardware::CPU.intel?
 
     cmake_args = %w[
       -DENABLE_CPPLINT=OFF
