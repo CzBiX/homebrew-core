@@ -1,19 +1,10 @@
 class Squashfs < Formula
   desc "Compressed read-only file system for Linux"
   homepage "https://github.com/plougher/squashfs-tools"
+  url "https://github.com/plougher/squashfs-tools/archive/refs/tags/4.7.tar.gz"
+  sha256 "f1605ef720aa0b23939a49ef4491f6e734333ccc4bda4324d330da647e105328"
   license "GPL-2.0-or-later"
   head "https://github.com/plougher/squashfs-tools.git", branch: "master"
-
-  stable do
-    url "https://github.com/plougher/squashfs-tools/archive/refs/tags/4.7.tar.gz"
-    sha256 "f1605ef720aa0b23939a49ef4491f6e734333ccc4bda4324d330da647e105328"
-
-    # add the missing pthread.h header, upstream pr ref, https://github.com/plougher/squashfs-tools/pull/312
-    patch do
-      url "https://github.com/plougher/squashfs-tools/commit/8b9288365fa0a0d80d8be82a3a6b42ea1c12629a.patch?full_index=1"
-      sha256 "cc3007de92a90c8caefb378b8405cde29c7acf570646d0bbc2bd0dcac1113a24"
-    end
-  end
 
   # Tags like `4.4-git.1` are not release versions and the regex omits these
   livecheck do

@@ -2,8 +2,8 @@ class Kubekey < Formula
   desc "Installer for Kubernetes and / or KubeSphere, and related cloud-native add-ons"
   homepage "https://kubesphere.io"
   url "https://github.com/kubesphere/kubekey.git",
-      tag:      "v3.1.10",
-      revision: "cdc54e0986ed98997703b527a49f8bab2c0ee950"
+      tag:      "v3.1.11",
+      revision: "f9d473060ec34cd8ffe5a87f2eceb1dead397f5c"
   license "Apache-2.0"
   head "https://github.com/kubesphere/kubekey.git", branch: "master"
 
@@ -35,6 +35,8 @@ class Kubekey < Formula
   end
 
   def install
+    ENV["CGO_ENABLED"] = "0"
+
     tags = "exclude_graphdriver_devicemapper exclude_graphdriver_btrfs containers_image_openpgp"
     project = "github.com/kubesphere/kubekey/v3"
     ldflags = %W[
