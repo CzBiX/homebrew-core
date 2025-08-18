@@ -5,7 +5,7 @@ class Libpulsar < Formula
   mirror "https://archive.apache.org/dist/pulsar/pulsar-client-cpp-3.7.2/apache-pulsar-client-cpp-3.7.2.tar.gz"
   sha256 "e4eee34cfa3d5838c08f20ac70f5b28239cb137bb59c75199f809141070620dd"
   license "Apache-2.0"
-  revision 2
+  revision 3
 
   bottle do
     sha256 cellar: :any,                 arm64_sequoia: "080993ea0c4f59d5ebb6a4c1d5a18f8266f558cbd5315b7a8556659e89f27d50"
@@ -21,7 +21,6 @@ class Libpulsar < Formula
   depends_on "cmake" => :build
   depends_on "pkgconf" => :build
 
-  depends_on "abseil"
   depends_on "openssl@3"
   depends_on "protobuf@29"
   depends_on "snappy"
@@ -43,6 +42,8 @@ class Libpulsar < Formula
       -DOPENSSL_ROOT_DIR=#{Formula["openssl@3"].opt_prefix}
       -DUSE_ASIO=OFF
     ]
+    # Avoid over-linkage to `abseil`.
+    args << "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-dead_strip_dylibs" if OS.mac?
 
     system "cmake", "-S", ".", "build", *args, *std_cmake_args
     system "cmake", "--build", "build", "--target", "pulsarShared", "pulsarStatic"
