@@ -4,6 +4,7 @@ class Protobuf < Formula
   url "https://github.com/protocolbuffers/protobuf/releases/download/v32.0/protobuf-32.0.tar.gz"
   sha256 "9dfdf08129f025a6c5802613b8ee1395044fecb71d38210ca59ecad283ef68bb"
   license "BSD-3-Clause"
+  revision 1
 
   livecheck do
     url :stable
@@ -24,6 +25,16 @@ class Protobuf < Formula
   depends_on "googletest" => :build
   depends_on "abseil"
   uses_from_macos "zlib"
+
+  on_linux do
+    # Avoid newer GCC which creates binary with higher GLIBCXX requiring runtime dependency
+    depends_on "gcc@12" => :build if DevelopmentTools.gcc_version("/usr/bin/gcc") < 12
+  end
+
+  fails_with :gcc do
+    version "11"
+    cause "absl/log/internal/check_op.h error: ambiguous overload for 'operator<<'"
+  end
 
   # Apply open PR to fix CRC32 usage on arm64 linux
   # https://github.com/protocolbuffers/protobuf/pull/23164
