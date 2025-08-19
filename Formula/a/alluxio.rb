@@ -45,6 +45,10 @@ class Alluxio < Formula
     defaults = etc/"alluxio/alluxio-site.properties"
     defaults.write(default_alluxio_conf) unless defaults.exist?
     ln_sf "#{etc}/alluxio/alluxio-site.properties", "#{libexec}/conf/alluxio-site.properties"
+
+    # Build `:all` bottle.
+    files = ["Dockerfile", "entrypoint.sh"]
+    files.each { |file| rm_r libexec/"integration/docker/#{file}" }
   end
 
   def caveats
