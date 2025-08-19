@@ -128,6 +128,18 @@ class Abi3audit < Formula
 
   def install
     virtualenv_install_with_resources
+
+    # Build an `:all` bottle.
+    usr_local_files = %w[
+      platformdirs/unix.py
+      platformdirs-4.3.8.dist-info/METADATA
+    ].map { |file| libexec/Language::Python.site_packages("python3")/file }
+    inreplace usr_local_files, "/usr/local", HOMEBREW_PREFIX
+
+    opt_homebrew_files = %w[
+      platformdirs/macos.py
+    ].map { |file| libexec/Language::Python.site_packages("python3")/file }
+    inreplace opt_homebrew_files, "/opt/homebrew", HOMEBREW_PREFIX
   end
 
   test do
